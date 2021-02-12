@@ -1,13 +1,8 @@
-import {useState} from "react";
+import {ReactElement} from "react";
 import MonacoEditor from "react-monaco-editor";
 
-export const Editor = () => {
-    const [code, setCode] = useState<string>(`public class HelloWorld {
-  public String getMessage() {
-    return "Hello World.";
-  }
-}
-`);
+export function Editor(props: { code: string, setCode: (newCode: string) => void }): ReactElement {
+    const { code, setCode } = props;
     const onChange = (newValue: string) => {
         setCode(newValue);
     };
@@ -19,4 +14,4 @@ export const Editor = () => {
         onChange={onChange}
         theme={"vs-dark"}
     />);
-};
+}

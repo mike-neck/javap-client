@@ -1,11 +1,12 @@
 import React from 'react';
-import {Editor} from "./Editor";
-import {AppBar, Box, Container, IconButton, makeStyles, Toolbar, Typography} from "@material-ui/core";
+import {AppBar, Container, IconButton, makeStyles, Toolbar, Typography} from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
+import {loadContext} from "./Context";
+import {Javap} from "./Javap";
 
 const styles = makeStyles((theme) => ({
     root: {
-        flexGrow: 1,
+        background: "#333",
     },
     menuButton: {
         marginRight: theme.spacing(2),
@@ -17,12 +18,14 @@ const styles = makeStyles((theme) => ({
         padding: theme.spacing(2)
     },
     codeContainer: {
-        maxWidth: "md"
+        maxWidth: "md",
+        paddingTop: theme.spacing(3),
     }
 }));
 
 function App() {
     const classes = styles();
+    const context = loadContext();
     return (
         <div className={classes.root}>
             <AppBar position="static">
@@ -36,9 +39,7 @@ function App() {
                 </Toolbar>
             </AppBar>
             <Container className={classes.codeContainer}>
-                <Box className={classes.box}>
-                    <Editor/>
-                </Box>
+                <Javap context={context}/>
             </Container>
         </div>
     );
