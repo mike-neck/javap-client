@@ -25,7 +25,8 @@ export function isJavapError(some: JavapSuccess | JavapError): some is JavapErro
 export function newJavapService(context: Context): JavapService {
     return {
         call(javaCode: string): Promise<JavapSuccess | JavapError> {
-            return callApi(context, javaCode);
+            return callApi(context, javaCode)
+                .catch(reason => typeErrorToJavapError(reason));
         }
     };
 }
@@ -64,7 +65,9 @@ async function deflateToBase64(javaCode: string): Promise<string> {
     const bytes = pako.gzip(textEncoder.encode(javaCode));
     // @ts-ignore
     const byteString = String.fromCharCode(...bytes);
-    return btoa(byteString).replace('/', '_').replace('+', '-')
+    return btoa(byteString)
+        .replaceAll('/', '_')
+        .replaceAll('+', '-');
 }
 
 function extractError(object: any): string {
@@ -75,4 +78,20 @@ function extractError(object: any): string {
 function extractCause(object: any): string {
     if ("cause" in object) return object["cause"];
     return "unknown error";
+}
+
+function typeErrorToJavapError(e: any): Promise<JavapSuccess | JavapError> {
+    return new Promise<JavapSuccess | JavapError>(resolve => {
+        if ("message" in e) {
+            resolve({
+                error: e["message"],
+                cause: e["message"],
+            });
+        } else {
+            resolve({
+                error: `error: ${e}`,
+                cause: `${e}`,
+            });
+        }
+    });
 }
