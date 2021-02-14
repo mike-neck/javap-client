@@ -1,9 +1,9 @@
 import React, {ReactElement, useState} from "react";
-import {Button, Collapse, Grid, IconButton} from "@material-ui/core";
+import {Button, Grid, IconButton} from "@material-ui/core";
 import {Editor} from "./Editor";
 import {Bytecode} from "./Bytecode";
 import {Context} from "./Context";
-import {isJavapError, isJavapSuccess, newJavapService} from "./JavapService";
+import {isJavapError, isJavapSuccess, JavapOutput, newJavapService} from "./JavapService";
 import {Alert, AlertTitle} from "@material-ui/lab";
 import CloseIcon from '@material-ui/icons/Close';
 
@@ -17,10 +17,11 @@ export function Javap(props: { context: Context }): ReactElement {
 `);
     const javapService = newJavapService(context);
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
-    const [contents, setContents] = useState<string | null>(null);
+    const [contents, setContents] = useState<JavapOutput[] | null>(null);
     const [errorMessage, setErrorMessage] = useState("");
     const onClickButton = () => {
         setButtonDisabled(true);
+        setContents(null);
         javapService.call(code)
             .then((result) => {
                 if (isJavapSuccess(result)) {
@@ -35,7 +36,9 @@ export function Javap(props: { context: Context }): ReactElement {
             <Grid container spacing={3}>
                 <Grid item xs={1}/>
                 <Grid item xs={10}>
-                    <ErrorMessage message={errorMessage}/>
+                    <ErrorMessage
+                        message={errorMessage}
+                        resetMessage={() => setErrorMessage("")}/>
                 </Grid>
                 <Grid item xs={1}/>
             </Grid>
@@ -50,7 +53,7 @@ export function Javap(props: { context: Context }): ReactElement {
                         execute javap
                     </Button>
                 </Grid>
-                <Grid item xs={10}/>
+                <Grid item xs={9}/>
             </Grid>
             <Grid container spacing={3}>
                 <Grid item xs={1}/>
@@ -70,22 +73,19 @@ export function Javap(props: { context: Context }): ReactElement {
     );
 }
 
-function ErrorMessage(props: { message: string | undefined }): ReactElement {
-    const { message } = props;
-    const [open, setOpen] = useState<boolean>(true);
+function ErrorMessage(props: { message: string | undefined, resetMessage: () => void }): ReactElement {
+    const { message, resetMessage } = props;
     if (message === undefined || message === "") {
         return (<></>);
     }
     return (
-        <Collapse in={open}>
-            <Alert
-                action={(<IconButton aria-label="close" color="inherit" size="small" onClick={() => setOpen(false)}>
-                    <CloseIcon fontSize="inherit"/>
-                </IconButton>)}
-                severity="error">
-                <AlertTitle>Error</AlertTitle>
-                {message}
-            </Alert>
-        </Collapse>
+        <Alert
+            action={(<IconButton aria-label="close" color="inherit" size="small" onClick={() => resetMessage()}>
+                <CloseIcon fontSize="inherit"/>
+            </IconButton>)}
+            severity="error">
+            <AlertTitle>Error</AlertTitle>
+            {message}
+        </Alert>
     );
 }

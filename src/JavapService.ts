@@ -2,13 +2,18 @@ import {Context} from "./Context";
 import * as pako from "pako";
 
 export type JavapSuccess = {
-    contents: string,
+    contents: JavapOutput[],
+};
+
+export type JavapOutput = {
+    name: string,
+    outputs: string,
 };
 
 export type JavapError = {
     error: string,
     cause: string,
-}
+};
 
 export type JavapService = {
     call: (javaCode: string) => Promise<JavapSuccess | JavapError>
