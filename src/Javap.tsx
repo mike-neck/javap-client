@@ -6,15 +6,19 @@ import {Context} from "./Context";
 import {isJavapError, isJavapSuccess, JavapOutput, newJavapService} from "./JavapService";
 import {Alert, AlertTitle} from "@material-ui/lab";
 import CloseIcon from '@material-ui/icons/Close';
+import ClearAll from '@material-ui/icons/ClearAll';
+import PlayArrowTwoToneIcon from '@material-ui/icons/PlayArrowTwoTone';
 
-export function Javap(props: { context: Context }): ReactElement {
-    const { context } = props;
-    const [code, setCode] = useState<string>(`public class HelloWorld {
+const initialJavaCode = `public class HelloWorld {
   public String getMessage() {
     return "Hello World.";
   }
 }
-`);
+`;
+
+export function Javap(props: { context: Context }): ReactElement {
+    const { context } = props;
+    const [code, setCode] = useState<string>(initialJavaCode);
     const javapService = newJavapService(context);
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
     const [contents, setContents] = useState<JavapOutput[] | null>(null);
@@ -30,6 +34,11 @@ export function Javap(props: { context: Context }): ReactElement {
                     setErrorMessage(result.error);
                 }
             }).finally(() => { setButtonDisabled(false) });
+    };
+    const clearButtonClick = () => {
+        setCode(initialJavaCode);
+        setContents(null);
+        setErrorMessage("");
     };
     return (
         <>
@@ -50,10 +59,22 @@ export function Javap(props: { context: Context }): ReactElement {
                         color="primary"
                         onClick={onClickButton}
                         disabled={buttonDisabled}>
-                        execute javap
+                        <PlayArrowTwoToneIcon fontSize="inherit"/>
+                        &nbsp;execute javap
                     </Button>
                 </Grid>
-                <Grid item xs={9}/>
+                <Grid item xs={7}/>
+                <Grid item xs={2}>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={clearButtonClick}
+                        disabled={buttonDisabled}
+                    >
+                        <ClearAll fontSize="inherit"/>
+                        &nbsp; clear
+                    </Button>
+                </Grid>
             </Grid>
             <Grid container spacing={3}>
                 <Grid item xs={1}/>
